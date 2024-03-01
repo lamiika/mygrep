@@ -6,16 +6,21 @@ using std::cin;
 using std::endl;
 using std::string;
 
-void first_functionality();
-void second_functionality(char *argv[]);
+struct booleans {
+  bool row_print;
+  bool total_row_print;
+};
+
+void non_parameter_functionality();
+void parameter_functionality(int argc, char *argv[]);
 
 int search(string *search_ptr, string *input_ptr);
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
-    first_functionality();
+    non_parameter_functionality();
   } else {
-    second_functionality(argv);
+    parameter_functionality(argc, argv);
   }
 
   return 0;
@@ -48,7 +53,27 @@ int search(string *search_ptr, string *input_ptr) {
   return position;
 }
 
-void first_functionality() {
+void filter_options(string *parameters_ptr, booleans *options_ptr) {
+  string parameters = *parameters_ptr;
+  string char_l = "l";
+  string char_o = "o";
+
+  if (parameters.substr(0, 2) == "-o") {
+    parameters = parameters.substr(2, parameters.length() - 2);
+  } else {
+    return;
+  }
+
+  if (search(&char_l, &parameters) != -1) {
+    options_ptr->row_print = true;
+  }
+
+  if (search(&char_o, &parameters) != -1) {
+    options_ptr->total_row_print = true;
+  }
+}
+
+void non_parameter_functionality() {
   string input_string;
   string search_string;
   string *input_ptr = &input_string;
@@ -56,10 +81,8 @@ void first_functionality() {
 
   cout << "Give a string from which to search for: ";
   getline(cin, input_string);
-//  input_string = "Erkki Hietalahti";
   cout << "Give a search string: ";
   getline(cin, search_string);
-//  search_string = "ti";
 
   int result = search(search_ptr, input_ptr);
 
@@ -70,6 +93,35 @@ void first_functionality() {
   }
 }
 
-void second_functionality(char *argv[]) {
-  cout << argv[1] << argv[2] << " Hi";
+// g++ main.cpp -o mygrep.exe && ./mygrep -olo following man_grep_plain_ASCII.txt
+void parameter_functionality(int argc, char *argv[]) {
+  string parameters = argv[argc-3];
+  string search_string = argv[argc-2];
+  string filename = argv[argc-1];
+
+  booleans options;
+  options.row_print = false;
+  options.total_row_print = false;
+  filter_options(&parameters, &options);
+
+  std::ifstream text_file(filename);
+  string line;
+  int row_number = 0;
+  int rows_total = 0;
+
+  while(std::getline(text_file, line)) {
+    int result = search(&search_string, &line);
+    if (result != -1) {
+      if (options.row_print) {
+        cout << row_number << ": ";
+      }
+      cout << line << endl;
+      rows_total++;
+    }
+    row_number++;
+  }
+
+  if (options.total_row_print) {
+    cout << "Occurrences of lines containing \"" << search_string << "\": " << rows_total; 
+  }
 }
