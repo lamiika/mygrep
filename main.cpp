@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cctype>
 using std::cout;
 using std::cin;
 using std::endl;
@@ -9,12 +10,14 @@ using std::string;
 struct booleans {
   bool row_print;
   bool total_row_print;
+  bool reverse_search;
+  bool ignore_case;
 };
 
 void non_parameter_functionality();
 void parameter_functionality(int argc, char *argv[]);
 
-int search(string *search_ptr, string *input_ptr);
+int search(string *search_ptr, string *input_ptr, bool ignore_case);
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
@@ -26,7 +29,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-int search(string *search_ptr, string *input_ptr) {
+int search(string *search_ptr, string *input_ptr, bool ignore_case) {
   string search_string = *search_ptr;
   string input_string = *input_ptr;
   int position = -1;
@@ -38,6 +41,10 @@ int search(string *search_ptr, string *input_ptr) {
       }
       char a_char = input_string[i+j];
       char b_char = search_string[j];
+      if (ignore_case) {
+        a_char = std::tolower(a_char);
+        b_char = std::tolower(b_char);
+      }
       if (a_char != b_char) {
         position = -1;
         break;
@@ -57,6 +64,8 @@ void filter_options(string *parameters_ptr, booleans *options_ptr) {
   string parameters = *parameters_ptr;
   string char_l = "l";
   string char_o = "o";
+  string char_r = "r";
+  string char_i = "i";
 
   if (parameters.substr(0, 2) == "-o") {
     parameters = parameters.substr(2, parameters.length() - 2);
@@ -64,12 +73,20 @@ void filter_options(string *parameters_ptr, booleans *options_ptr) {
     return;
   }
 
-  if (search(&char_l, &parameters) != -1) {
+  if (search(&char_l, &parameters, true) != -1) {
     options_ptr->row_print = true;
   }
 
-  if (search(&char_o, &parameters) != -1) {
+  if (search(&char_o, &parameters, true) != -1) {
     options_ptr->total_row_print = true;
+  }
+
+  if (search(&char_r, &parameters, true) != -1) {
+    options_ptr->reverse_search = true;
+  }
+
+  if (search(&char_i, &parameters, true) != -1) {
+    options_ptr->ignore_case = true;
   }
 }
 
@@ -84,7 +101,7 @@ void non_parameter_functionality() {
   cout << "Give a search string: ";
   getline(cin, search_string);
 
-  int result = search(search_ptr, input_ptr);
+  int result = search(search_ptr, input_ptr, false);
 
   if (result == -1) {
     cout << search_string << " NOT found in \"" << input_string << "\"\n";
@@ -102,6 +119,8 @@ void parameter_functionality(int argc, char *argv[]) {
   booleans options;
   options.row_print = false;
   options.total_row_print = false;
+  options.reverse_search = false;
+  options.ignore_case = false;
   filter_options(&parameters, &options);
 
   std::ifstream text_file(filename);
@@ -110,7 +129,14 @@ void parameter_functionality(int argc, char *argv[]) {
   int rows_total = 0;
 
   while(std::getline(text_file, line)) {
-    int result = search(&search_string, &line);
+    int result = search(&search_string, &line, options.ignore_case);
+    if (options.reverse_search) {
+      if (result == -1) {
+        result = 1;
+      } else {
+        result = -1;
+      }
+    }
     if (result != -1) {
       if (options.row_print) {
         cout << row_number << ": ";
@@ -121,7 +147,11 @@ void parameter_functionality(int argc, char *argv[]) {
     row_number++;
   }
 
-  if (options.total_row_print) {
+  if (options.total_row_print && !options.reverse_search) {
     cout << "Occurrences of lines containing \"" << search_string << "\": " << rows_total; 
+  }
+  
+  if (options.total_row_print && options.reverse_search) {
+    cout << "Occurrences of lines NOT containing \"" << search_string << "\": " << rows_total; 
   }
 }
