@@ -116,6 +116,8 @@ void parameter_functionality(int argc, char *argv[]) {
   string search_string = argv[argc-2];
   string filename = argv[argc-1];
 
+  std::ifstream text_file(filename);
+
   booleans options;
   options.row_print = false;
   options.total_row_print = false;
@@ -123,7 +125,24 @@ void parameter_functionality(int argc, char *argv[]) {
   options.ignore_case = false;
   filter_options(&parameters, &options);
 
-  std::ifstream text_file(filename);
+  try {
+    if (!text_file.good()) {
+      throw "File isn't readable or file doesn't exist.";
+    }
+    std::ifstream value(filename, std::ifstream::ate | std::ifstream::binary);
+    if (value.tellg() <= 0) {
+      throw "Empty file.";
+    }
+  } 
+  catch(const char *error) {
+    cout << "Exception: " << error << endl;
+    return;
+  }
+  catch(...) {
+    cout << "Unknown error." << endl;
+    return;
+  }
+
   string line;
   int row_number = 0;
   int rows_total = 0;
