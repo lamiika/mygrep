@@ -27,10 +27,11 @@ Day    | Time   | I worked on
 Day    | Time   | I worked on
 :-----:|:------:|:------
 01.03. | 01:00h | Part 4 functionality
-03.03. | 01.00h | Part 4 error handling
+03.03. | 01:00h | Part 4 error handling
 
 ### Documentation (01:00h)
 
 Day    | Time   | I worked on
 :-----:|:------:|:------
 01.03. | 01:00h | Doc boilerplate
+03.03. | 01:00h | Writing documentation

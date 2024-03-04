@@ -104,7 +104,7 @@ void non_parameter_functionality() {
   int result = search(search_ptr, input_ptr, false);
 
   if (result == -1) {
-    cout << search_string << " NOT found in \"" << input_string << "\"\n";
+    cout << "\"" << search_string << "\" NOT found in \"" << input_string << "\"\n";
   } else {
     cout << "\"" << search_string << "\" found in \"" << input_string << "\" in position " << result << "\n";
   }
@@ -112,6 +112,19 @@ void non_parameter_functionality() {
 
 // g++ main.cpp -o mygrep.exe && ./mygrep -olo following man_grep_plain_ASCII.txt
 void parameter_functionality(int argc, char *argv[]) {
+  try {
+    if (argc < 3) {
+      throw "Too few parameters. Search term and file name required. Alternatively give no parameters at all.";
+    }
+  }
+  catch(const char *error) {
+    cout << "Exception: " << error << endl;
+    return;
+  }
+  catch(...) {
+    cout << "Generic error";
+    return;
+  }
   string parameters = argv[argc-3];
   string search_string = argv[argc-2];
   string filename = argv[argc-1];
@@ -167,10 +180,10 @@ void parameter_functionality(int argc, char *argv[]) {
   }
 
   if (options.total_row_print && !options.reverse_search) {
-    cout << "Occurrences of lines containing \"" << search_string << "\": " << rows_total; 
+    cout << "Occurrences of lines containing \"" << search_string << "\": " << rows_total << endl; 
   }
   
   if (options.total_row_print && options.reverse_search) {
-    cout << "Occurrences of lines NOT containing \"" << search_string << "\": " << rows_total; 
+    cout << "Occurrences of lines NOT containing \"" << search_string << "\": " << rows_total << endl; 
   }
 }
