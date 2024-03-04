@@ -2,7 +2,7 @@
 
 ### Entire time used: **09:00** hours
 
-Last updated on 1.3.2024
+Last updated on 03.03.2024
 
 ### Part 1 (02:00h)
 
