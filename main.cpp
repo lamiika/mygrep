@@ -139,14 +139,18 @@ void parameter_functionality(int argc, char *argv[]) {
   filter_options(&parameters, &options);
 
   try {
+    std::ifstream value(filename, std::ifstream::ate | std::ifstream::binary);
+    if (value.tellg() <= 0) {
+      throw string("Exception Nr. -1 \nCould not find out the size of file \"" + filename + "\"");
+    }
     if (!text_file.good()) {
       throw "File isn't readable or file doesn't exist.";
     }
-    std::ifstream value(filename, std::ifstream::ate | std::ifstream::binary);
-    if (value.tellg() <= 0) {
-      throw "Empty file.";
-    }
   } 
+  catch(string error) {
+    cout << "An exception occurred. " << error << endl;
+    return;
+  }
   catch(const char *error) {
     cout << "Exception: " << error << endl;
     return;
